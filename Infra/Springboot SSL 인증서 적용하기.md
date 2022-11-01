@@ -126,10 +126,10 @@ ssl key의 암호를 입력하라고 할텐데, 해당 암호는 반드시 기�
 저장한 이후에는 properties (또는 yml)에서 ssl 키에 대한 정보를 제공해야 한다. 아래와 같이 properties 파일을 수정한다.
 
 ```
-**server.ssl.key-store**=[key 파일 위치]
-**server.ssl.key-store-type**=PKCS12
-**server.ssl.key-store-password**=[key 파일 password]
-**server.http2.enabled**=true
+server.ssl.key-store=[key 파일 위치]
+server.ssl.key-store-type=PKCS12
+server.ssl.key-store-password=[key 파일 password]
+server.http2.enabled=true
 ``` 
 
 다음과 같은 작업이 모두 끝난 다음에는 아래와 같은 과정이 모두 진행된 것이다.
