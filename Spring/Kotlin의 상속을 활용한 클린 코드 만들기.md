@@ -122,21 +122,21 @@ open class UsersLoginResReturnDto(
 이후, 어차피 `하나의 메소드에서 발생하는 Exception` 에 대해서만 사용하면 되는 클래스이기 때문에, `해당 Exception이 발생하는 메소드 아래에 클래스를 private하게 정의`하기로 하였다.
 
 ```kotlin
-    public fun login(usersLoginRequestDto: UsersLoginRequestDto): UsersLoginResReturnDto {
-        if (!isExistsUser(usersLoginRequestDto.user_id)) throw NotAcceptedException(DummyUsersLoginResReturnDto("Email is not valid"))
-        val users = findUsers(usersLoginRequestDto.user_id)
-        if (!passwordEncoder.matches(
-                usersLoginRequestDto.password,
-                users.password
-            )
-        ) throw NotAcceptedException(DummyUsersLoginResReturnDto("Password is not valid"))
-        val accessToken: String = jwtTokenProvider.createAccessToken(usersLoginRequestDto.user_id)
-        val refreshToken: String = jwtTokenProvider.createRefreshToken(usersLoginRequestDto.user_id)
-        return UsersLoginResReturnDto(users.user_id!!, accessToken, users.nickname, refreshToken)
-    }
+public fun login(usersLoginRequestDto: UsersLoginRequestDto): UsersLoginResReturnDto {
+    if (!isExistsUser(usersLoginRequestDto.user_id)) throw NotAcceptedException(DummyUsersLoginResReturnDto("Email is not valid"))
+    val users = findUsers(usersLoginRequestDto.user_id)
+    if (!passwordEncoder.matches(
+            usersLoginRequestDto.password,
+            users.password
+        )
+    ) throw NotAcceptedException(DummyUsersLoginResReturnDto("Password is not valid"))
+    val accessToken: String = jwtTokenProvider.createAccessToken(usersLoginRequestDto.user_id)
+    val refreshToken: String = jwtTokenProvider.createRefreshToken(usersLoginRequestDto.user_id)
+    return UsersLoginResReturnDto(users.user_id!!, accessToken, users.nickname, refreshToken)
+}
 
-    private class DummyUsersLoginResReturnDto(val detailedMessage: String) : UsersLoginResReturnDto("", "", "", "") {
-    }
+private class DummyUsersLoginResReturnDto(val detailedMessage: String) : UsersLoginResReturnDto("", "", "", "") {
+}
 ```
 
 다음과 같은 방법으로 `private class` 를 생성한 후, 필요한 자료형을 가지고 있는 `DTO를 상속했다.` 클래스 내부에서 클래스를 정의할 수 있기 때문에, 다음과 같은 방법으로 클래스를 선언한 뒤 해당 클래스를 만들도록 하였다. 추가적으로 필요한 변수들에 대해선 생성자를 통해서 전달하였다.
