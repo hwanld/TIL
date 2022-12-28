@@ -111,7 +111,7 @@ class MyMockMvcTests {
 ```
 
 ### 5. Testing With a Running Server
-* 이미 동작하고 있는 server를 테스트 하고 싶다면, random ports를 사용하는 것이 바람직하다. `@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)` 
+* server의 동작과 함께 테스트를 진행하고 싶다면, random ports를 사용하는 것이 바람직하다. `@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)` 
 * `@LocalServerPort` 어노테이션은 사용중인 실제 port를 주입 후 테스트 할 수 있도록 해준다. 이때, `WebTestClient`를 `@Autowire`해서 동작중인 서버의 테스트가 가능하다.
 * WebTestClient는 WebClient를 테스트 하기 위해서 사용하는 것인데, 이는 WebFlux 기반의 테스트를 하고자 할때 사용한다. 만약 WebFlux를 사용중이라면, MVC와 Flux 모두 WebTestClient를 활용해서 테스트 할 수 있다. (반대로 MVC만 사용중이라면 WebTestClient의 사용은 불가능하다)
 * MVC만 사용 할 때는, 아래 코드와 같이 `TestRestTemplate`를 사용해서 테스트를 진행하면 된다.
