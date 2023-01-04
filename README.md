@@ -11,3 +11,4 @@ Today I Learned
 
 <2023.01.04> [SpringBoot Testing](https://github.com/wkazxf/TIL/blob/main/Spring/SpringBoot%20Test.md) <br>
 
+<2023.01.04> [SpringBoot Test Error : JPA metamodel must not be empty](https://github.com/wkazxf/TIL/blob/main/Spring/SpringBoot%20Test%20Error%20:%20JPA%20metamodel%20must%20not%20be%20empty.md) <br>
