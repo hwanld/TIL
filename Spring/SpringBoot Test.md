@@ -1,5 +1,5 @@
-**#  SpringBoot Test**
-[SpringBoot Test](https://docs.spring.io/spring-boot/docs/2.7.7/reference/html/features.html#features.testing) SpringBoot Testing Reference를 참고.
+#  SpringBoot Test
+[SpringBoot Test](https://docs.spring.io/spring-boot/docs/2.7.7/reference/html/features.html#features.testing) Reference를 참고.
 <br>
 ## 1. build.gradle.kts (Gradle) Setting
 * build.gradle.kts 파일에 다음을 추가한다.
@@ -128,6 +128,38 @@ class MyRandomPortTestRestTemplateTests {
 
 }
 ```
- 
+### 6. Auto-configured Tests
+* SpringBoot의 testing은 기본적으로 auto-configuration system을 가지고 있지만, 때로는 테스트를 위해서 configuration의 loading이 너무 많을 수도 있다.
+* 따라서 필요에 따라서 configuration을 slicing해서 필요한 configuration만 load할 필요가 있다.
+
+### 7. Auto-configured JSON Tests
+* `@JsonTest` 어노테이션을 활용하면 Json의 serialization과 deserialization을 자동으로 할 수 있다. 해당 어노테이션은 다음과 같은 라이브러리들을 활용한다.
+>* Jackson `ObjectMapper`, any `@JsonComponent` beans and any Jackson `Module`s
+>* `Gson`
+>* `Jsonb`
+* SpringBoot에는 AssertJ 기반으로 JSONAssert와 JsonPath 라이브러리와 함께 작동하여 Json Test를 가능하게 한다.
+```kotlin
+@JsonTest
+class MyJsonTests(@Autowired val json: JacksonTester<VehicleDetails>) {
+
+    @Test
+    fun serialize() {
+        val details = VehicleDetails("Honda", "Civic")
+        // Assert against a `.json` file in the same package as the test
+        assertThat(json.write(details)).isEqualToJson("expected.json")
+        // Or use JSON path based assertions
+        assertThat(json.write(details)).hasJsonPathStringValue("@.make")
+        assertThat(json.write(details)).extractingJsonPathStringValue("@.make").isEqualTo("Honda")
+    }
+
+    @Test
+    fun deserialize() {
+        val content = "{\"make\":\"Ford\",\"model\":\"Focus\"}"
+        assertThat(json.parse(content)).isEqualTo(VehicleDetails("Ford", "Focus"))
+        assertThat(json.parseObject(content).make).isEqualTo("Ford")
+    }
+
+}
+```
 
 #TIL
