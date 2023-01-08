@@ -1,4 +1,3 @@
-#TIL
 #  Spring Environment와 getActiveProfiles()
 ## 1. Environment 인터페이스란?
 <br>

@@ -161,5 +161,10 @@ class MyJsonTests(@Autowired val json: JacksonTester<VehicleDetails>) {
 
 }
 ```
-
+### 8. Auto-configured Spring MVC Test
+* `@WebMvcTest` 어노테이션의 사용을 통해서 Spring MVC Controller가 잘 동작하는지 확인할 수 있다. `@Controller`, `@ControllerAdvice`, `@JsonComponent`, `Converter`, `GenericConverter`, `Filter`, `HandlerInterceptor`, `WebMvcConfigurer`, `WebMvcRegistrations`, `HandleMethodArgumentResolver` beans들을 모두 스캔 후 auto-configures하도록 한다.
+* `@Component`와 `@ConfigurationProperties` 들은 `@WebMvcTest` 어노테이션 사용 시 스캔되지 않는다. 
+* `@ConfigurationProperties` 를 사용하기 위해서는 `@EnableConfigurationProperties` 어노테이션을 사용해야 한다.
+* Jackson과 같은 추가적인 bean의 등록이 필요한 경우, `@Import` 어노테이션을 사용해서 추가적인 configuration class들을 import할 수 있다.
+* 
 #TIL
