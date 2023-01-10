@@ -14,3 +14,6 @@ Today I Learned
 <2023.01.04> [SpringBoot Test Error : JPA metamodel must not be empty](https://github.com/wkazxf/TIL/blob/main/Spring/SpringBoot%20Test%20Error%20:%20JPA%20metamodel%20must%20not%20be%20empty.md) <br>
 
 <2023.01.08> [Set과 Override를 통한 자료구조 내 중복 객체 제거](https://github.com/wkazxf/TIL/blob/main/Spring/Set%EA%B3%BC%20Override%EB%A5%BC%20%ED%86%B5%ED%95%9C%20%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0%20%EB%82%B4%20%EC%A4%91%EB%B3%B5%20%EA%B0%9D%EC%B2%B4%20%EC%A0%9C%EA%B1%B0.md) <br>
+
+<2023.01.10> [SpringBoot Test Error : No Serializer found for class](https://github.com/wkazxf/TIL/blob/main/Spring/SpringBoot%20Test%20Error%20:%20No%20Serializer%20found%20for%20class.md) <br>
+
