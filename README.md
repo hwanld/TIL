@@ -20,3 +20,5 @@ Today I Learned
 <2023.01.10> [SpringBoot Test : Mocking with Mockito](https://github.com/wkazxf/TIL/blob/main/Spring/SpringBoot%20Test%20:%20Mocking%20with%20Mockito.md) <br>
 
 <2023.01.11> [SpringBoot Test : TestMethodOrder](https://github.com/wkazxf/TIL/blob/main/Spring/SpringBoot%20Test%20:%20TestMethodOrder.md) <br>
+
+<2023.01.11> [SpringBoot Test : Redis Repository Test](https://github.com/wkazxf/TIL/blob/main/Spring/SpringBoot%20Test%20:%20Redis%20Repository%20Test.md) <br>
