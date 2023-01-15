@@ -22,3 +22,5 @@ Today I Learned
 <2023.01.11> [SpringBoot Test : TestMethodOrder](https://github.com/wkazxf/TIL/blob/main/Spring/SpringBoot%20Test%20:%20TestMethodOrder.md) <br>
 
 <2023.01.11> [SpringBoot Test : Redis Repository Test](https://github.com/wkazxf/TIL/blob/main/Spring/SpringBoot%20Test%20:%20Redis%20Repository%20Test.md) <br>
+
+<2023.01.15> [Spring REST Docs](https://github.com/wkazxf/TIL/blob/main/Spring/Spring%20REST%20Docs.md) <br>
