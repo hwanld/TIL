@@ -108,7 +108,7 @@ mockMvc.perform(post("/api/v2/users/save")
                 )))
                 .andReturn();
 ```
-`fieldWithPath` 에서는 해당 필드의 이름을 명시하면 되고, `description` 에는 해당 필드의 설명을 명시하면 된다. `type` 에는 해당 필드의 타입을 명시하면 되는데, 
+먼저 `document`에는 해당 문서의 이름을 명시하고, `responseFields()`라고 문서화 하고 싶은 필드를 명시한 다음 `fieldWithPath` 에서는 해당 필드의 이름을 명시하면 되고, `description` 에는 해당 필드의 설명을 명시하면 된다. `type` 에는 해당 필드의 타입을 명시하면 되는데, 
 JSON 에서 사용되면서 동시에 지원되는 타입은 아래와 같다.
 > 1. array
 > 2. boolean
@@ -139,7 +139,7 @@ this.mockMvc.perform(get("/user/5")
                     .description("The user's name")))); 
 ```
 Json 에서 계층 구조를 이루고 있는 경우, 다음과 같이 `.` 을 활용해서 나타내면 된다. 위 JSON 을 보면 name, email 필드를 가지고 있는
-contact 필드를 확인할 수 있는데, contact 필드의 경우 다음과 `subSectionWithPath` 를 활용해서 나타낼 수 있다.
+contact 필드를 확인할 수 있는데, contact 필드의 경우 다음과 `subSectionWithPath` 를 활용해서 나타낼 수 있다. <br>
 ```java
 this.mockMvc.perform(get("/user/5")
         .accept(MediaType.APPLICATION_JSON))
@@ -148,12 +148,34 @@ this.mockMvc.perform(get("/user/5")
                 subsectionWithPath("contact")
                     .description("The user's contact details")))); 
 ```
+`requestFields` 역시 위와 동일하게 작성하면 활용할 수 있다. 최종적으로 작성한 문서는 아래와 같다.
+```java
+        MvcResult saveResult = mockMvc.perform(post("/api/v2/users/save")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(requestDto))
+            )
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("Users",
+                requestFields(
+                    fieldWithPath("usersId").description("usersID value to save.").type(JsonFieldType.STRING),
+                    fieldWithPath("nickname").description("nickname value to save.").type(JsonFieldType.STRING),
+                    fieldWithPath("password").description("password value to save.").type(JsonFieldType.STRING)
+                ),
+                responseFields(
+                    fieldWithPath("accessToken").description("User's access token value").type(JsonFieldType.STRING),
+                    fieldWithPath("refreshToken").description("User's refresh token value").type(JsonFieldType.STRING)
+                )))
+            .andReturn();
+```
+
 ### 2) Request Parameters
 Request 의 Parameter 의 경우 `requestParameters` 를 활용해서 다음과 같이 사용할 수 있다. `GET` 요청의 `query string` 을 다음과 같이 나타낼 수 있다.
 ```java
 this.mockMvc.perform(get("/users?page=2&per_page=100"))
         .andExpect(status().isOk())
-        .andDo(document("users", requestParameters(
+        .andDo(document("users", 
+            requestParameters(
                 parameterWithName("page")
                     .description("The page to retrieve"), 
                 parameterWithName("per_page")
@@ -182,3 +204,33 @@ this.mockMvc.perform(get("/locations/{latitude}/{longitude}", 51.5072, 0.1275))
 ```
 마찬가지로 해당 결과들은 `path-parameters.adoc` 파일에 저장된다. 그리고 마찬가지로 문서화 되어 있는 path 를 사용하지 않았거나,
 문서화 되어 있지 않은 path 를 사용한 경우 모두 테스트에 실패하게 된다.
+### 4) Request Parts
+Request 의 part 또는 multipart 의 경우에도 `requestParts` 를 사용해서 나타낼 수 있다. part 의 경우 파일 등을 전송해야 하는 상황일 때 일반적으로 많이 사용한다.
+```java
+this.mockMvc.perform(multipart("/upload").file("file", "example".getBytes())) 
+		.andExpect(status().isOk()).andDo(document("upload",
+                    requestParts(
+                            partWithName("file").description("The file to upload")) 
+		));
+```
+마찬가지로 해당 결과들은 `request-parts.adoc` 파일에 저장된다. 그리고 마찬가지로 문서화 되어 있는 part 를 사용하지 않았거나,
+문서화 되어 있지 않은 part 를 사용한 경우 모두 테스트에 실패하게 된다.
+### 5) Http Headers
+Request 의 header 의 경우에도 `requestHeaders` 그리고 `responseHeaders` 로 나타낼 수 있다.
+```java
+this.mockMvc.perform(get("/people").header("Authorization", "Basic dXNlcjpzZWNyZXQ="))
+        .andExpect(status().isOk()).andDo(document("headers", 
+                requestHeaders(
+                        headerWithName("Authorization").description("Basic auth credentials")), 
+				responseHeaders(
+						headerWithName("X-RateLimit-Limit").description("The total number of requests permitted per period"),
+						headerWithName("X-RateLimit-Remaining").description("Remaining requests permitted in current period"),
+						headerWithName("X-RateLimit-Reset").description("Time at which the rate limit period will reset")
+                )
+        ));
+```
+마찬가지로 해당 결과들은 `request-headers.adoc` 파일에 저장된다. 그리고 마찬가지로 문서화 되어 있는 header 를 사용하지 않았거나,
+문서화 되어 있지 않은 header 를 사용한 경우 모두 테스트에 실패하게 된다.
+
+
+이 외에도 `constraints`, `reusing API`, `default Snippets` 와 같이 다양한 기능을 제공하고 있다. 우선 위의 5가지 기능으로도 현재 작성하고자 하는 API 문서를 작성할 수 있기에, `Documenting` 은 이 정도 학습하고자 한다.
