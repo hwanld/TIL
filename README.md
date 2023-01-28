@@ -26,3 +26,5 @@ Today I Learned
 <2023.01.15> [Spring REST Docs](https://github.com/wkazxf/TIL/blob/main/Spring/Spring%20REST%20Docs.md) <br>
 
 <2023.01.16> [Spring REST Docs](https://github.com/wkazxf/TIL/blob/main/Spring/Spring%20REST%20Docs.md) <br>
+
+<2023.01.29> [Spring TDD 실습하기(1)](https://github.com/wkazxf/TIL/blob/main/Spring/Spring%20TDD%20%EC%8B%A4%EC%8A%B5%ED%95%98%EA%B8%B0(1).md) <br>
