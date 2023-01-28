@@ -177,3 +177,121 @@ public class BagsServiceTest {
 }
 ```
 이후 IntelliJ 를 기준으로 아래 탭의 `Problems` 를 클릭하고, `Project Errors` 를 클릭하면 프로젝트 전체에서 나타나는 모든 에러들을 확인할 수 있는데, 이제 하나씩 해당 에러를 삭제하기 위한 코드를 작성하면 TDD 를 적용해서 본 코드를 개발할 수 있다.
+
+## 4. 통합 테스트 작성 및 나머지 파트 개발
+Controller Layer 의 경우 Service Layer 의 메소드를 Mocking 해서 테스트가 이루어 지는데, Controller Layer 에서 Logic 과 관련된 검증이 필요하지 않을 때 (개인적으로 Controller 계층에서는 Test 를 실시하지 않아도 누구나 검증 가능한 수준 선에서 개발이 되어야 한다고 생각함) Controller Layer 보다는 바로 통합 테스트의 작성을 통해서 조금이라고 효율성을 올리고자 하였다.
+
+바로 통합 테스트 코드를 작성하고, 통합 테스트 코드에서 Problem 이 발생하는 부분들을 바로 수정해 나가고자 하였다.
+
+```java
+@SpringBootTest
+@AutoConfigureMockMvc
+@ExtendWith(RestDocumentationExtension.class)
+public class BagsIntegrationTest {
+
+    @Autowired
+    private BagsService bagsService;
+
+    @Autowired
+    private BagsRepository bagsRepository;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    private String usersToken;
+    private String adminToken;
+
+    @BeforeEach
+    void setUpForSpringRestDocs(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(documentationConfiguration(restDocumentation))
+                .build();
+    }
+
+    @BeforeEach
+    void saveUsersAndAdminAndSetUpTokens() throws Exception {
+        UsersSaveRequestDto usersSaveRequestDto = new UsersSaveRequestDto(
+                "test@gmail.com",
+                "testNickname",
+                "testPassword",
+                null
+        );
+
+        UsersSaveRequestDto adminSaveRequestDto = new UsersSaveRequestDto(
+                "admin",
+                "admin",
+                "testPassword",
+                "ROLE_ADMIN"
+        );
+
+        MvcResult usersSaveResult = mockMvc.perform(post("/api/v2/users/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(usersSaveRequestDto))
+                )
+                .andReturn();
+
+        String content = usersSaveResult.getResponse().getContentAsString();
+        UsersLoginResponseDto loginResponseDto = new ObjectMapper().readValue(content, UsersLoginResponseDto.class);
+        usersToken = loginResponseDto.getAccessToken();
+
+        content = usersSaveResult.getResponse().getContentAsString();
+        loginResponseDto = new ObjectMapper().readValue(content, UsersLoginResponseDto.class);
+        adminToken = loginResponseDto.getAccessToken();
+
+        String.valueOf(mockMvc.perform(post("/api/v2/users/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(adminSaveRequestDto))
+        ));
+    }
+
+    @Test
+    @DisplayName("[Integration] 가방 저장")
+    void Integration_관리자계정으로_가방저장() throws Exception {
+        //given
+        BagsSaveRequestDto bagsSaveRequestDto = new BagsSaveRequestDto(
+                "KOR",
+                "SUWON"
+        );
+
+        BagsResponseDto bagsResponseDto = new BagsResponseDto(
+                "KOR_SUWON_1",
+                false,
+                LocalDateTime.MIN.toString(),
+                ""
+        );
+
+        //when
+        MvcResult saveResult = mockMvc.perform(post("/api/v3/bags/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(bagsSaveRequestDto))
+                )
+        //then
+                .andExpect(status().isOk())
+                .andExpect(content().json(new ObjectMapper().writeValueAsString(bagsResponseDto)))
+                .andDo(document("Bags-save",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestFields(
+                                fieldWithPath("countryCode").description("Code of country").type(JsonFieldType.STRING),
+                                fieldWithPath("regionCode").description("Code of region").type(JsonFieldType.STRING)
+                        ),
+                        responseFields(
+                                fieldWithPath("bagsId").description("Generated bagsId. {countryCode}_{regionCode}_{auto_increment_index}").type(JsonFieldType.STRING),
+                                fieldWithPath("rented").description("If bag is rented. Default is false.").type(JsonFieldType.BOOLEAN),
+                                fieldWithPath("whenIsRented").description("LocalDateTime of rented. If it is not renting, value is LocalDateTime.MIN").type(JsonFieldType.STRING),
+                                fieldWithPath("rentingUsersId").description("Id which users is renting. If it is not renting, value is empty String").type(JsonFieldType.STRING)
+                        )))
+                .andDo(print())
+                .andReturn();
+    }
+
+}
+```
+이전까지의 로직이 잘 정리가 되어 있다면, 그리고 그에 맞게 잘 개발을 해왔다면 Controller Layer 의 추가적인 구현 만으로 위 통합 테스트 코드가 동작할 것이다. 이미 예상한 시나리오가 있고 그에 맞게 코드가 작동해야 하기 때문에 Spring REST Docs 의 내용 역시 미리 적용해서 위와 같이 테스트 코드를 작성하고, 테스트 코드가 동작하게끔 나머지 코드를 작성하였다.
+
+## 5. TDD 의 첫 실습을 마치며
+말로만 TDD 가 중요하다, Test 가 중요하다는 이야기를 많이 들어왔는데, 처음으로 TDD 를 적용해 본 결과로는 `테스트 코드를 충분히 잘 짤 수 있는 능력이 있으며`, `요구사항을 충분히 잘 정리할 수 있고`, `너무 간단하지 않은 로직의 코드를 작성할 때` TDD 방법론을 적용해서 개발한다면 더욱 시너지를 낼 수 있다고 생각된다.
+
+실제로 Test 코드를 Test 를 위해서 작성하는 것이 아니라, 내가 개발할 기능이 이런 식으로 작동해야지 하는 마음으로 작성하였더니, Test 코드의 작성 시간에 비해서 본 개발 시간은 현저히 줄어드는 것을 확인할 수 있었다.
+
+프로젝트가 계속해서 개발 될 수록 더더욱 복잡한 로직들이 많아질텐데, 이러한 상황에서 TDD 를 적극적으로 활용한다면 분명 개발적인 측면에 있어서 효율적인 우위를 점할 수 있으리라 생각한다.
