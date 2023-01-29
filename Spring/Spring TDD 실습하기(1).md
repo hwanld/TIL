@@ -85,6 +85,7 @@ public class Bags {
 ```java
 @DataJpaTest
 @AutoConfigureTestDatabase
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BagsRepositoryTest {
 
     @Autowired
@@ -94,6 +95,7 @@ public class BagsRepositoryTest {
     BagsRepository bagsRepository;
 
     @BeforeAll
+    @Test
     @DisplayName("Users 저장 이후 Bags 저장 테스트")
     void 테스트전_users저장_그리고_Bags저장_테스트() {
         Users users = Users.builder()
