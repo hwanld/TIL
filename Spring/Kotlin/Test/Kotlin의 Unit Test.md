@@ -146,10 +146,6 @@ class hooksTest : BehaviorSpec() {
     }
 ```
 Spec 클래스 내부에는 beforeTest와 같은 메소드들이 전부 implement 되어있고, 우리가 이러한 hooks 들을 사용하기 위해선 해당 메소드를 override 해서 사용하면 된다.
-
-
-## 2-4. Kotest : Mockk (Mocking)
-
 <br><br>
 
 ## 3. Kotest Extension for Spring
