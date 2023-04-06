@@ -155,7 +155,7 @@ Spec 클래스 내부에는 beforeTest와 같은 메소드들이 전부 implemen
 ## 3. Kotest Extension for Spring
 `@SpringBootTest` 와 같은 통합 테스트, 그리고 `@DataJpaTest` 와 같은 유닛 테스트에서 모두 Kotest의 Spec을 사용할 수 있다. Kotest에서는 Spring Framework의 DI를 위해서 Spring Extension을 제공한다. 아래와 같이 의존성을 추가할 수 있다. (v4.4.3)
 ```groovy
-implementation("io.kotest:kotest-extensions-spring:4.4.3")
+    implementation("io.kotest:kotest-extensions-spring:4.4.3")
 ```
 여기서 **아주 조심해야 하는 부분**이 있는데, **`Kotest`의 버전과 `Spring Extension` 의 버전이 다르면 테스트가 제대로 작동하지 않는다.** 위에서 언급한 바와 같이, 무턱대고 최신 버전으로 설치했다간 아예 실행이 되지 않는 낭패를 볼 수 있다. 정리하면 아래와 같이 의존성을 추가해야 Kotest를 Spring 환경에서 사용할 수 있다. (v4.4.3)
 ```groovy
@@ -254,6 +254,126 @@ class UsersRepositoryTest : BehaviorSpec() {
 }
 ```
 <br>
+
+## 5. Service Unit Test with Kotest
+Service Unit Test를 Kotest를 활용해서 작성하는 법을 알아볼텐데, 다양한 방법이 있겠지만 필자는 개발을 함에 있어서 시간을 최대한으로 줄이는 것이 중요하다고 생각한다. Service Test의 경우에는 `Mocking` 을 사용해서 진행하기 때문에 `SpringExtension` 이 필요하지 않다. `SpringExtension` 을 사용하게 되면 실행 시간이 늘어나기 때문에, Service Test 에서는 Spring Extension을 따로 사용하지 않는다. 이번에도 `BehaviorSpec` 을 사용해서 작성하였는데, 상황에 맞게 조율하며 사용하면 될 것 같다.
+
+`Service Unit Test` 의 핵심은 `Mocking` 에 있다. 스프링에서는 결합도를 낮추기 위해서 `DI(Dependency Injection)` 을 사용하고 있는데, 테스트 하고자 하는 객체를 제외하고 필요로 하는 모든 객체들은 `가짜 객체 (Mocking)` 을 활용해서 DI 해주고 테스트 할 것이다. `Kotest` 에서는 `Mockito` 의 Mocking 이 아닌, `Mockk` 라이브러리를 활용해서 Mocking을 하는데, 기본적인 사용법은 기존의 `Mockito` 와 거의 유사하다. 우선 아래와 같이 의존성을 추가한다.
+
+```gradle
+	testImplementation("io.mockk:mockk:1.12.0")
+	testImplementation("com.ninja-squad:springmockk:3.0.0")
+```
+이후 Mockking을 하기 위해선 Mock 형식의 객체를 만들어야 하는데, 객체는 다음과 같이 생성과 초기화 할 수 있다.
+```kotlin
+    val jwtTokenProvider = mockk<JwtTokenProvider>()
+    val passwordEncoder = mockk<PasswordEncoder>()
+    val plannersRepository = mockk<PlannersRepository>()
+    val usersRepository = mockk<UsersRepository>()
+```
+그 다음 Mocking을 하기 위해선 Mocking을 필요로 하는 범위에서 다음과 같이 할 수 있다.
+```kotlin
+    every { usersRepository.findAll() } returns emptyList()
+    every { usersRepository.save(any()) } returns users
+```
+Mocking 역시 every 뿐만 아니라 다양한 방법으로 Mocking 할 수 있는데, 해당 부분은 지금은 언급하지 않겠다. <br>
+다음으로는 Mocking한 객체를 DI할 것인데, 여기에도 다양한 방법이 있을 수 있다. 필자는 이전에 말했던 바와 같이 빌드 타임을 최대한으로 줄이기 위해서, 최소한의 방법으로 DI를 할 것이다. 따라서, `테스트 하고자 하는 객체가 필요로 하는 객체를 Mocking 한 다음 생성자를 통해서 직접 DI` 하는 방식으로 진행할 것이다.
+```kotlin
+    val usersService = UsersService(usersRepository, plannersRepository, jwtTokenProvider, passwordEncoder)
+```
+이제 이러한 방식으로 Service Test 를 짜 볼 것인데, 코드는 아래와 같다.
+```kotlin
+class UsersServiceTest : BehaviorSpec() {
+
+    val jwtTokenProvider = mockk<JwtTokenProvider>()
+    val passwordEncoder = mockk<PasswordEncoder>()
+    val plannersRepository = mockk<PlannersRepository>()
+    val usersRepository = mockk<UsersRepository>()
+    val usersService = UsersService(usersRepository, plannersRepository, jwtTokenProvider, passwordEncoder)
+
+    val users = Users(
+        user_id = "test@gmail.com",
+        nickname = "test",
+        gender = 1,
+        photoUrl = "test.com",
+        token = "token",
+        m_password = "testPassword"
+    )
+
+    init {
+        given("UsersSaveRequestDto를 주고") {
+            val usersSaveRequestDto = UsersSaveRequestDto(
+                user_id = "test@gmail.com",
+                nickname = "test",
+                gender = 1,
+                photoUrl = "test.com",
+                password = "testPassword"
+            )
+
+            every { usersRepository.findAll() } returns emptyList()
+            every { usersRepository.save(any()) } returns users
+
+            `when`("save하면") {
+                val result = usersService.save(usersSaveRequestDto)
+                then("save된 user_id가 리턴된다") {
+                    result shouldBe "test@gmail.com"
+                }
+            }
+        }
+        // 중략
+    }
+}
+```
+추가로, Mocking한 객체가 하나의 테스트가 종료된 이후 다음 테스트에서 재사용 되는 경우, 기존에 Mocking한 내용이 남아 있어 문제가 될 수 있다. Kotest Reference에서도 이러한 상황에 대해 설명하고 있고, Kotest Reference에서 소개하는 두 가지 옵션을 소개하고자 한다. <br><br>
+**Option 1 - setup mocks before tests**
+```kotlin
+class MyTest : FunSpec({
+
+    lateinit var repository: MyRepository
+    lateinit var target: MyService
+
+    beforeTest {
+        repository = mockk()
+        target = MyService(repository)
+    }
+
+    test("Saves to repository") {
+        // ...
+    }
+
+    test("Saves to repository as well") {
+        // ...
+    }
+
+})
+```
+<br>
+
+**Option 2 - reset mocks after tests**
+```kotlin
+class MyTest : FunSpec({
+
+    val repository = mockk<MyRepository>()
+    val target = MyService(repository)
+
+    afterTest {
+        clearMocks(repository)
+    }
+
+    test("Saves to repository") {
+        // ...
+    }
+
+    test("Saves to repository as well") {
+        // ...
+    }
+
+})
+
+
+```
+<br>
+
 
 ### REFERENCE
 [스프링에서 코틀린 스타일 테스트 코드 작성하기](https://techblog.woowahan.com/5825/) <Br>
