@@ -370,8 +370,95 @@ class MyTest : FunSpec({
 ```
 <br>
 
+## 6. Controller Unit Test with Kotlin
+Controller Unit Test의 경우, Authentication을 제외하면 크게 어려운 점이 없었다. 본인의 경우, Authentication까지 모두 테스트 하기 위해서는 Mocking을 해야 하는 문제가 있었고, Controller에서 비즈니스 로직이 많이 들어가지 않기 때문에 Integration Test만으로 이를 대체할 수 있으리라고 생각해서 생략하였다. 하지만 간단하게 사용 방법 정도는 정리해 보고자 한다.
+
+우선, 2개의 어노테이션을 사용하였다. 마찬가지로 @SpringBootTest는 사용하지 않았다.
+```kotlin
+@MockkBean(JpaMetamodelMappingContext::class)
+@WebMvcTest(UsersController::class)
+```
+JpaMetamodelMappingContext의 경우, 왜 저런 어노테이션을 사용하였는지는 [다음 글](https://github.com/hwanld/TIL/blob/main/Spring/Java/Test/SpringBoot%20Test%20Error%20:%20JPA%20metamodel%20must%20not%20be%20empty.md)을 참고하면 될 것 같다. 간단히 요약하면 JpaAuditing 을 사용하지만 모든 Bean이 등록되지 않기 때문에 이러한 문제가 발생할 수 있다.
+
+@WebMvcTest를 사용해서 WAS를 실행시키지 않는 상황에서 WebMvc를 사용해서 테스트를 진행하였다. 또한 SpringExtension을 Import해서 사용하였다.
+
+```kotlin
+@MockkBean(JpaMetamodelMappingContext::class)
+@WebMvcTest(UsersController::class)
+class UsersControllerTest() : BehaviorSpec() {
+
+    override fun extensions() = listOf(SpringExtension)
+
+    @Autowired
+    lateinit var mockMvc: MockMvc
+
+    @Autowired
+    lateinit var usersController: UsersController
+
+    @MockkBean
+    lateinit var usersService: UsersService
+
+    @MockkBean
+    lateinit var redisService: RedisService
+
+    @MockBean
+    lateinit var jwtTokenProvider: JwtTokenProvider
+
+    @MockkBean
+    lateinit var authenticationManager: AuthenticationManager
+
+    @MockkBean
+    lateinit var userDetailsService: UserDetailsService
+
+    final val objectMapper = ObjectMapper()
+```
+
+init 블록 전의 코드는 다음과 같은데, Controller Test의 경우 컨트롤러의 정상적인 동작을 위해서 주입해야 하는 Bean이 많다. (Controller -> Service -> Repostiory 등등) 하지만 Unit Test의 경우 알다싶이 이러한 모든 Bean들을 전부 주입하지 않고, 따라서 내가 필요로 하는 특정 객체들만 @MockkBean을 사용해서 주입해주면 된다.
+
+Kotest의 경우 Mockito 라이브러리와 매우 비슷한 어노테이션 구조를 가지고 있고 그 기능 또한 동일하기 때문에, MockkBean, SpykBean 등에 대해서는 [다음 글](https://github.com/hwanld/TIL/blob/main/Spring/Java/Test/SpringBoot%20Test%20:%20Mocking%20with%20Mockito.md)을 참고하면 좋을 것 같다. 필자는 지금은 SpykBean을 활용해 모든 기능을 활성화 할 필요가 없었기 때문에 다음과 같이만 사용하였다.
+
+```kotlin
+given("UsersSaveRequestDto를 주고") {
+    val usersSaveRequestDto = UsersSaveRequestDto(
+        user_id = validUserId,
+        nickname = validNickname,
+        gender = 1,
+        photoUrl = "testPhotoUrl.com",
+        password = validPassword
+    )
+
+    val users = usersSaveRequestDto.toEntity()
+    val usersResponseDto = UsersResponseDto(usersSaveRequestDto.toEntity())
+    val usersReturnDto = UsersReturnDto(usersResponseDto)
+    val expected = RestAPIMessages(
+        httpStatus = 200,
+        message = "User is saved well",
+        data = usersReturnDto
+    )
+
+    every { usersService.save(any()) } returns validUserId
+    every { usersService.findByUserId(validUserId) } returns usersResponseDto
+
+    `when`("/api/v2/users POST 요청 보내면") {
+        then("HttpStatus.OK, UsersReturnDto가 REST로 응답") {
+
+            mockMvc.post("/api/v2/users") {
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper.writeValueAsString(usersSaveRequestDto)
+            }.andExpect {
+                status { isOk() }
+                content { objectMapper.writeValueAsString(expected) }
+            }
+
+        }
+    }
+```
+mockMvc의 경우도 Java와 사용하는 방법은 크게 다르지 않았는데, Kotlin DSL스럽게 사용하는 방법이 있어서 [다음 글](https://www.baeldung.com/kotlin/mockmvc-kotlin-dsl)을 참고하였다.
+
+<br>
 
 ### REFERENCE
 [스프링에서 코틀린 스타일 테스트 코드 작성하기](https://techblog.woowahan.com/5825/) <Br>
-[Kotest Reference](https://kotest.io/docs/framework/framework.html)
+[Kotest Reference](https://kotest.io/docs/framework/framework.html) <br>
+[MockMvc Kotlin DSL](https://www.baeldung.com/kotlin/mockmvc-kotlin-dsl) <br>
 
