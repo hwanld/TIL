@@ -39,14 +39,14 @@ class Planners(
 
 결국, fetch 전략을 LAZY로 설정하던, EAGER로 설정하던 상관 없이 `N+1문제는 발생`한다. 다만 그 발생하는 시점이 다를 뿐이다. 이를 해결하기 위한 방법은 여러 가지가 있는데, `Fetch Join` 이나 `@EntityGraph`를 제일 많이 사용한다. 
 
-`Fetch Join`은 말 그대로 SQL의 `Fetch` 전략을 사용하는 것인데, 일반적으로 우리가 Spring Data JPA를 사용한다면 SQL Function을 사용하게 된다. 이때 `@Query` 어노테이션을 활용해 직접 JPQL를 지정할 수 있는데, 이때 해당 메소드의 `JPQL에 fetch 키워드를 사용`하는 것이다.
+`Fetch Join`은 말 그대로 JPQL의 `Fetch Join` 을 사용하는 것인데, 일반적으로 우리가 Spring Data JPA를 사용한다면 SQL Function을 사용하게 된다. 이때 `@Query` 어노테이션을 활용해 직접 JPQL를 지정할 수 있는데, 이때 해당 메소드의 `JPQL에 join Fetch 키워드를 사용`하는 것이다.
 ```kotlin
 interface UsersRepository : JpaRepository<Users, String> {
     @Query("select u from Users u join fetch u.planners)
     fun findAllJoinFetch() : List<Users>
 }
 ```
-이런 식으로 사용하게 되면 만약 우리가 Users를 조회할 때, planners가 N개가 있다고 하면 planners N개를 조회하기 위해서 N개의 쿼리가 아닌, **한 개의 쿼리로 Users와 Join되어 있는 모든 Planners를 조회**할 수 있을 것이다. **연관관꼐가 있을 경우에도 하나의 쿼리문으로 표현할 수 있기 때문에 매우 유리하다.**
+이런 식으로 사용하게 되면 만약 우리가 Users를 조회할 때, planners가 N개가 있다고 하면 planners N개를 조회하기 위해서 N개의 쿼리가 아닌, **한 개의 쿼리로 Users와 Join되어 있는 모든 Planners를 조회**할 수 있을 것이다. **연관관계가 있을 경우에도 하나의 쿼리문으로 표현할 수 있기 때문에 매우 유리하다.**
 
 하지만 Fetch Join을 사용하게 되면 단점이 존재하는데, `Fetch Type`을 사용할 수 없다는 점이다. Fetch 전략이 Lazy 전략이라도, 쿼리를 실행할 때 이미 join fetch을 사용해서 fetch를 하기 때문에 원하는 것 처럼 전략을 사용하지 못할 수 있다.
 
@@ -54,7 +54,7 @@ interface UsersRepository : JpaRepository<Users, String> {
 
 `Entity Graph`는 쿼리 수행 시 바로 가져 올 필드명을 지정하면 해당 필드만 Lazy가 아닌 Eager로 가져오는 전략이다. 이 역시 JPQL을 사용해서 한 번에 가져오는, Fetch Join과 비슷한 전략이다.
 
-그 외에도 여러 전략이 존재하지만 해답은 없는 듯 하다. 따라서, 지금 현재 리펙토링 중인 프로젝트의 상황에 가장 알맞게 사용할 수 있도록 한 번 개선을 해보고자 한다.
+그 외에도 여러 전략이 존재하지만 정답은 없는 듯 하다. 따라서, 지금 현재 리펙토링 중인 프로젝트의 상황에 가장 알맞게 사용할 수 있도록 한 번 개선을 해보고자 한다.
 
 <br>
 
@@ -201,7 +201,7 @@ Users 엔티티에 Planners 엔티티를 양방향으로 서로 조인해주는 
 > * Users.Planners 에 한 개 이상의 객체가 존재한다면 READ가 정상적으로 작동, **하지만**
 > * Users.Planners 가 비어있다면 SQL Function이 NULL을 리턴
 > 
-그리고 이 문제는 [다음 글](https://stackoverflow.com/questions/43879474/jpa-join-fetch-results-to-null-on-empty-many-side)을 참조해서 해결할 수 있었다. `FETCH JOIN` 은 사실 SQL Function이 아니라 JPQL에서 제공해주는 Function이다. 즉, JPQL로 작성한 해당 쿼리는 SQL에서 `inner join`으로 변환되어 실행된다. inner join은 교집합을 리턴하는 조인인데, **만약 USERS가 PLANNERS를 하나도 가지고 있지 않다면 USERS와 PLANNERS의 inner join은 존재하지 않게 되고, 이렇게 되면 USERS 테이블의 PLANNERS를 가지고 있지 않은 엔티티들은 Fetch Join의 결과값에서 제외된다는 것이다.** 따라서 이를 해결하기 위해서 교집합 뿐만 아니라 Users 전체를 포함하기 위해서 `LEFT` 키워드를 추가로 사용해서 PLANNERS를 가지고 있지 않은 USERS 역시 리턴할 수 있도록 하였다.
+그리고 이 문제는 [다음 글](https://stackoverflow.com/questions/43879474/jpa-join-fetch-results-to-null-on-empty-many-side)을 참조해서 해결할 수 있었다. `FETCH JOIN` 은 사실 SQL Function이 아니라 JPQL에서 제공해주는 Function이다. 즉, JPQL로 작성한 해당 쿼리는 SQL에서 `inner join`으로 변환되어 실행된다. inner join은 교집합을 결과로 줄텐데, **만약 USERS가 PLANNERS를 하나도 가지고 있지 않다면 USERS와 PLANNERS의 inner join은 존재하지 않게 되고, 이렇게 되면 USERS 테이블의 PLANNERS를 가지고 있지 않은 엔티티들은 Fetch Join의 결과값에서 제외된다는 것이다.** 따라서 이를 해결하기 위해서 교집합 뿐만 아니라 Users 전체를 포함하기 위해서 `LEFT` 키워드를 추가로 사용해서 PLANNERS를 가지고 있지 않은 USERS 역시 리턴할 수 있도록 하였다.
 ```kotlin
     @Query("select u from Users u left join fetch u.planners p where u.user_id = :user_id")
     fun findUsersByUser_idFetchPlanners (@Param("user_id")user
