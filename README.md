@@ -38,3 +38,5 @@ Today I Learned
 <2023.04.19> [N+1 Refactoring](https://github.com/hwanld/TIL/blob/main/Spring/N%2B1%20Refactoring.md) <br>
 
 <2023.04.22> [DB Indexing을 활용한 리펙토링](https://github.com/hwanld/TIL/blob/main/Spring/DB%20Indexing%EC%9D%84%20%ED%99%9C%EC%9A%A9%ED%95%9C%20%EB%A6%AC%ED%8E%99%ED%86%A0%EB%A7%81.md) <br>
+
+<2023.04.28> [Extension Function을 활용한 클린 코드 만들기](https://github.com/hwanld/TIL/blob/main/Spring/Kotlin/Extension%20Function%EC%9D%84%20%ED%99%9C%EC%9A%A9%ED%95%9C%20%ED%81%B4%EB%A6%B0%20%EC%BD%94%EB%93%9C%20%EB%A7%8C%EB%93%A4%EA%B8%B0.md)
