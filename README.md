@@ -41,4 +41,4 @@ Today I Learned
 
 <2023.04.28> [Extension Function을 활용한 클린 코드 만들기](https://github.com/hwanld/TIL/blob/main/Spring/Kotlin/Extension%20Function%EC%9D%84%20%ED%99%9C%EC%9A%A9%ED%95%9C%20%ED%81%B4%EB%A6%B0%20%EC%BD%94%EB%93%9C%20%EB%A7%8C%EB%93%A4%EA%B8%B0.md)
 
-<2023.05.23> [가상 면접 사례로 배우는 대규모 시스템 설계 기초 : Ch1. 사용자 수에 따른 규모 확장성]()
+<2023.05.23> [가상 면접 사례로 배우는 대규모 시스템 설계 기초 : Ch1. 사용자 수에 따른 규모 확장성](https://github.com/hwanld/TIL/blob/main/Books/%EA%B0%80%EC%83%81%20%EB%A9%B4%EC%A0%91%20%EC%82%AC%EB%A1%80%EB%A1%9C%20%EB%B0%B0%EC%9A%B0%EB%8A%94%20%EB%8C%80%EA%B7%9C%EB%AA%A8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%20%EC%84%A4%EA%B3%84%20%EA%B8%B0%EC%B4%88/Ch1.%20%EC%82%AC%EC%9A%A9%EC%9E%90%20%EC%88%98%EC%97%90%20%EB%94%B0%EB%A5%B8%20%EA%B7%9C%EB%AA%A8%20%ED%99%95%EC%9E%A5%EC%84%B1(1).md)
