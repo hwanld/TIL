@@ -47,6 +47,8 @@ Today I Learned
 
 <2023.06.06> [MySQL Transaction and Lock](https://github.com/hwanld/TIL/blob/main/Database/MySQL%20Transaction%20and%20Lock.md)
 
+<2023.06.06> [영속성 관리]()
+
 <br> 
 
 ## Topic have to learn
@@ -54,3 +56,4 @@ Today I Learned
 * Transaction and Sequence
 * Persistence Context
 * Mock, Spy, Stub
+* Garbage Collection
