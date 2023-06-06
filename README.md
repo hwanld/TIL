@@ -45,7 +45,7 @@ Today I Learned
 
 <2023.06.05> [Spring Transaction Management](https://github.com/hwanld/TIL/blob/main/Spring/Spring%20Transaction%20Management.md)
 
-<2023.06.06> [MySQL Transaction and Lock]()
+<2023.06.06> [MySQL Transaction and Lock](https://github.com/hwanld/TIL/blob/main/Database/MySQL%20Transaction%20and%20Lock.md)
 
 <br> 
 
