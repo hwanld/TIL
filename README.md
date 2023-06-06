@@ -47,7 +47,7 @@ Today I Learned
 
 <2023.06.06> [MySQL Transaction and Lock](https://github.com/hwanld/TIL/blob/main/Database/MySQL%20Transaction%20and%20Lock.md)
 
-<2023.06.06> [영속성 관리]()
+<2023.06.06> [영속성 관리](https://github.com/hwanld/TIL/blob/main/Spring/%EC%98%81%EC%86%8D%EC%84%B1%20%EA%B4%80%EB%A6%AC.md)
 
 <br> 
 
