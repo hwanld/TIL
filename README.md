@@ -49,6 +49,8 @@ Today I Learned
 
 <2023.06.06> [영속성 관리](https://github.com/hwanld/TIL/blob/main/Spring/%EC%98%81%EC%86%8D%EC%84%B1%20%EA%B4%80%EB%A6%AC.md)
 
+<2023.06.07> [Java Garbage Collection]()
+
 <br> 
 
 ## Topic have to learn
@@ -57,3 +59,4 @@ Today I Learned
 * Persistence Context
 * Mock, Spy, Stub
 * Garbage Collection
+* Mock vs Stub
