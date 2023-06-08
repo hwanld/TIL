@@ -51,12 +51,13 @@ Today I Learned
 
 <2023.06.07> [Java Garbage Collection](https://github.com/hwanld/TIL/blob/main/Spring/Java/Java%20Garbage%20Collection.md)
 
+<2023.06.08> [Transaction Isolation and ReadOnly]()
+
 <br> 
 
 ## Topic have to learn
 * Transaction(Readonly)
-* Transaction and Sequence
-* Persistence Context
+* ~~Transaction and Sequence~~
+* ~~Persistence Context~~
 * Mock, Spy, Stub
-* Garbage Collection
-* Mock vs Stub
+* ~~Garbage Collection~~
