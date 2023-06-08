@@ -51,7 +51,7 @@ Today I Learned
 
 <2023.06.07> [Java Garbage Collection](https://github.com/hwanld/TIL/blob/main/Spring/Java/Java%20Garbage%20Collection.md)
 
-<2023.06.08> [Transaction Isolation and ReadOnly]()
+<2023.06.08> [Transaction Isolation and ReadOnly](https://github.com/hwanld/TIL/blob/main/Spring/Transaction%20Isolation%20and%20ReadOnly.md)
 
 <br> 
 
