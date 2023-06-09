@@ -29,6 +29,12 @@ MySQL의 InnoDB가 기본적으로 사용하는 격리 수준이다. 바이너�
 ### SERIALIZABLE
 트랜잭션 격리 수준 중에서 가장 엄격한 격리 수준으로, 위에서 언급한 **격리성과 관련된 3가지 문제를 모두 해결할 수 있으나 동시 처리 성능이 다른 트랜잭션 격리 수준에 비해 훨씬 떨어진다**. 읽기 작업 역시 공유 잠금(읽기 잠금)을 획득해야 하며, 동시에 다른 트랜잭션은 그러한 레코드를 변경하지 못하게 된다. 즉, 한 트랜잭션이 한 레코드를 읽기만 하더라도 다른 트랜잭션은 해당 레코드를 건들지 못한다는 말이다.
 
+## @Transactional(readOnly = true)
+이제 Spring에서 지원하는 Transactionality에 대해 한 번 알아 보고자 한다. 기본적으로 `CrudRepository`로부터 상속받는 메소드들은 `SimpleJpaRepository`로부터 transactional configuration을 상속받는다. 조회 동작을 위해서는 transaction configuration의 `readOnly` 플래그를 true로 설정한다. 그 외 동작은 그냥 `@Transactional` 하나만 사용해서 default transaction configuration이 적용되도록 사용한다. 
+
+Read-only Transcations를 위해서는 readOnly flag의 값만 변화시키면 된다. `@Transactional(readOnly=true)`와 같이 사용할 수 있다. 하지만 이렇게 설정하는 것은 일부 데이터베이스에선 manipulating 쿼리를 거부하지만 이렇게 하면 mainpulating query를 트리거하지 않는 검사로 작동하지 않는다. 대신 readOnly 플래거는 성능 최적화를 위해 JDBC 드라이버에 힌트로 전파된다. 또한 Spring은 기본 JPA optimizer에 대해 몇 가지 최적화를 수행한다. 예를 들어서 `readOnly` 옵션을 사용한다면 Hibernate를 사용할 때, flush mode는 NEVER로 설정되어 Hibernate가 dirty check를 건너뛰게 된다. (큰 객체 트리에 대해서 성능의 현저한 상향)
+
 참조자료 : <br>
 자바 ORM 표준 JPA 프로그래밍 (김영한 지음. 에이콘) <br>
-Real MySQL 8.0 (백은빈, 이성욱 지음. 위키북스)
+Real MySQL 8.0 (백은빈, 이성욱 지음. 위키북스) <br>
+[Spring Data JPA Reference](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#transactions)<br>

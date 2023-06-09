@@ -56,7 +56,7 @@ Today I Learned
 <br> 
 
 ## Topic have to learn
-* Transaction(Readonly)
+* ~~Transaction(Readonly)~~
 * ~~Transaction and Sequence~~
 * ~~Persistence Context~~
 * Mock, Spy, Stub
