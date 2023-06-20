@@ -1,6 +1,6 @@
 # TIL
-Today I Learned
 
+## Today I Learned
 <2022.11.01> [INFRA/SpringBoot SSL 인증서 적용](https://github.com/hwanld/TIL/blob/main/Infra/Springboot%20SSL%20%EC%9D%B8%EC%A6%9D%EC%84%9C%20%EC%A0%81%EC%9A%A9%ED%95%98%EA%B8%B0.md) <br>
 
 <2022.11.04> [Spirng/Spring Environment와 getActiveProfiles()](https://github.com/hwanld/TIL/blob/main/Spring/Kotlin/Spring%20Environment%EC%99%80%20getActiveProfiles().md)<br>
@@ -53,13 +53,11 @@ Today I Learned
 
 <2023.06.08> [Transaction Isolation and ReadOnly](https://github.com/hwanld/TIL/blob/main/Spring/Transaction%20Isolation%20and%20ReadOnly.md)
 
-<2023.06.11> [Mock vs Stub](https://github.com/hwanld/TIL/blob/main/Spring/Java/Test/Mock%20vs%20Stub.md)
+<2023.06.11> [Mock vs Stub](https://github.com/hwanld/TIL/blob/main/Spring/Java/Test/Mock%20vs%20Stub.md) <br> 
 
-<br> 
+<2023.06.20> [Proxy Pattern](https://github.com/hwanld/TIL/blob/main/Spring/Java/Proxy%20Pattern.md) <br>
 
-## Topic have to learn
-* ~~Transaction(Readonly)~~
-* ~~Transaction and Sequence~~
-* ~~Persistence Context~~
-* Mock, Spy, Stub
-* ~~Garbage Collection~~
+
+## Books I read
+* 초보 웹 개발자를 위한 스프링5 프로그래밍 입문 (최범균 지음. 가메출판사) <br>
+  * 2023.06.19 ~
